@@ -1,0 +1,17 @@
+.hover-bg-light:hover {
+  background-color: #f8f9fa !important;
+  color: #0d6efd !important;
+}
+
+.popupAnimate {
+  animation: popup 1.4s infinite ease-in-out;
+}
+@keyframes popup {
+  0%,
+  100% {
+    transform: height;
+  }
+  50% {
+    transform: scaleY(1.2);
+  }
+}
