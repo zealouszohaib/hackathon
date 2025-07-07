@@ -33,10 +33,13 @@ function Upload() {
       });
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const formData = new FormData();
-      formData.append('file', zipBlob, 'images.zip');
-      const response = await axios.post('http://localhost:3000/api/v1/upload', formData, {
+      formData.append('zip_file', zipBlob, 'images.zip');
+      const response = await axios.post('http://34.93.86.68:8050/analyze/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+
+
+      console.log(response.data);
       Swal.fire({
         icon: 'success',
         title: 'Upload successful',
