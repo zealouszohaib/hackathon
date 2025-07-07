@@ -9,12 +9,20 @@ function Upload() {
   const [preview, setPreview] = useState([]);
   const [segmentedImage, setSegmentedImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [mostDamagedImage, setMostDamagedImage] = useState(null);
+  const [previewMap, setPreviewMap] = useState({});
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setSelectedFiles(files);
+    const map = {};
+    files.forEach(file => {
+      map[file.name] = URL.createObjectURL(file);
+    });
+    setPreviewMap(map);
     setPreview(files.map(file => URL.createObjectURL(file)));
     setSegmentedImage(null);
+    setMostDamagedImage(null);
   };
 
   const handleUpload = async () => {
@@ -38,8 +46,12 @@ function Upload() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-
       console.log(response.data);
+      setMostDamagedImage({
+        ...response.data.message,
+        localUrl: previewMap[response.data.message.image_name]
+      });
+      setPreview([]);
       Swal.fire({
         icon: 'success',
         title: 'Upload successful',
@@ -77,17 +89,27 @@ function Upload() {
       </Form>
 
       <Row className="mt-4">
-        {preview && preview.map((src, idx) => (
-          <Col md={4} key={idx}>
-            <h6>Original Image {idx + 1}</h6>
-            <img src={src} className="img-fluid border rounded" alt={`Original ${idx + 1}`} />
-          </Col>
-        ))}
-        {segmentedImage && (
+        {mostDamagedImage ? (
           <Col md={6}>
-            <h6>Segmented Output</h6>
-            <img src={segmentedImage} className="img-fluid border rounded" alt="Segmented" />
+            <h6>Most Damaged Image</h6>
+            <img
+              src={mostDamagedImage.localUrl}
+              className="img-fluid border rounded"
+              alt={mostDamagedImage.image_name}
+            />
+            <div className="mt-2">
+              <strong>Damage Score:</strong> {mostDamagedImage.damage_score}
+              <br />
+              <strong>Justification:</strong> {mostDamagedImage.justification}
+            </div>
           </Col>
+        ) : (
+          preview && preview.map((src, idx) => (
+            <Col md={4} key={idx}>
+              <h6>Original Image {idx + 1}</h6>
+              <img src={src} className="img-fluid border rounded" alt={`Original ${idx + 1}`} />
+            </Col>
+          ))
         )}
       </Row>
     </Card>
